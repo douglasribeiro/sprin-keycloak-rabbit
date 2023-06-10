@@ -1,0 +1,46 @@
+spring:
+  application:
+    name: cartao
+  rabbitmq:
+    host: ${RABBIT_SERVER}
+    port: 5672
+    username: guest
+    password: guest    
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        ddl-auto: update
+        dialect: org.hibernate.dialect.MySQL5Dialect
+  jmx:
+    enabled: false
+  datasource:
+    url: jdbc:mysql://${MYSQL_DB}:3306/mscurso?AllowPublicKeyRetriveal=true&ssModel=DISABLED
+    username: root
+    password: root
+    
+server:
+  port: 0
+  
+eureka:
+  client:
+    service-url:
+      defaultZone: http://cursoms-eureka-user:ecok-usr-eeuramssur@${EUREKA_SERVER}:8761/eureka
+  instance:
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}          
+ 
+mq:
+  queues:
+    emissao-cartoes: emissao-cartoes
+    
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'   
+        
+logging:
+  file:
+    name: ./logs/log-file.log         
+
+#sudo docker run -it --name rabbitmq -p 5670:5672 -p 15670:15672 rabbitmq:3.9-management    

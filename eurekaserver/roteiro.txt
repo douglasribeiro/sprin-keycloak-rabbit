@@ -1,0 +1,23 @@
+sudo docker build --tag cursoms-eureka .
+sudo docker run --name cursoms-eureka -p 8761:8761 --network cursoms-network cursoms-eureka
+
+sudo docker build --tag cursoms-cartoes .
+sudo docker run --name cursoms-cartoes --network cursoms-network -e RABBIT_SERVER=cursoms-rabbitmq -e EUREKA_SERVER=cursoms-eureka -e MYSQL_DB=cursoms-mysql -d cursoms-cartoes
+
+docker network create cursoms-network
+
+sudo docker run --name cursoms-adminer -p 8088:8080 --network cursoms-network adminer
+sudo docker run --name cursoms-rabbitmq -p 5670:5672 -p 15670:15672 --network cursoms-network rabbitmq:3.9-management
+sudo docker run --name cursoms-mysql -e MYSQL_ROOT_PASSWORD=root -p 3306:3306 --network cursoms-network mysql:5.7
+
+sudo docker build --tag cursoms-clientes .
+sudo docker run --name cursoms-clientes --network cursoms-network -e EUREKA_SERVER=cursoms-eureka -e MYSQL_DB=cursoms-mysql -d cursoms-clientes
+sudo docker run --name cursoms-clientes-rep01 --network cursoms-network -e EUREKA_SERVER=cursoms-eureka -e MYSQL_DB=cursoms-mysql -d cursoms-clientes
+
+sudo docker build --tag cursoms-avaliadorcredito .
+sudo docker run --name cursoms-avaliadorcredito --network cursoms-network -e RABBIT_SERVER=cursoms-rabbitmq -e EUREKA_SERVER=cursoms-eureka -d cursoms-avaliadorcredito
+
+sudo docker run -p 8081:8080 -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin --network cursoms-network --name cursoms-keycloak quay.io/keycloak/keycloak:18.0.0 start-dev
+
+sudo docker build --tag cursoms-gateway .
+sudo docker run --name cursoms-gateway -p 8080:8080 --network cursoms-network -e EUREKA_SERVER=cursoms-eureka -e KEYCLOAK_SERVER=cursoms-keycloak -e KEYCLOAK_PORT=8080 -d cursoms-gateway

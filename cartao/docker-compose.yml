@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+  mysqlsrv:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: "root"
+      MYSQL_DATABASE: "mscurso"
+    ports:
+      - "3306:3306"
+    networks:
+      - cursoms-network
+
+  adminer:
+    image: adminer
+    ports:
+      - 8088:8080
+    networks:
+      - cursoms-network
+
+networks: 
+  cursoms-network:
+    driver: bridge
